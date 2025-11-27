@@ -23,6 +23,28 @@ export class CharacterService {
     return this.characterRepository.save(character);
   }
 
+  async update(id: number, updateCharacterDto: UpdateCharacterDto) {
+    const character = await this.findOne(id);
+    if (character) {
+      const updateData: any = {
+        ...updateCharacterDto,
+      };
+
+      // Transform property from number to Location reference
+      if (updateCharacterDto.property !== undefined) {
+        updateData.property = updateCharacterDto.property ? { id: updateCharacterDto.property } : null;
+      }
+
+      // Transform favPlaces from number[] to Location references
+      if (updateCharacterDto.favPlaces !== undefined) {
+        updateData.favPlaces = updateCharacterDto.favPlaces ? updateCharacterDto.favPlaces.map(id => ({ id })) : [];
+      }
+
+      return this.characterRepository.update(id, updateData);
+    }
+    throw new Error(`Character with id ${id} not found`);
+  }
+
   findOne(id: number) {
     return this.characterRepository.findOne({ where: { id }, relations: ['property'] });
   }
