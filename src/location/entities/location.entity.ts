@@ -1,4 +1,4 @@
-import { Column, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Character } from "../../character/entities/character.entity";
 
 export class Location {
@@ -16,4 +16,7 @@ export class Location {
 
     @OneToOne(() => Character)
     owner: Character;
+
+    @ManyToOne(() => Character)
+    favorites: Character[];
 }
