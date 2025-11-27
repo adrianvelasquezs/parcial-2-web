@@ -3,10 +3,11 @@ import { CharacterService } from './character.service';
 import { CharacterController } from './character.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Character } from './entities/character.entity';
+import { TokenModule } from '../token/token.module';
 
 @Module({
   controllers: [CharacterController],
   providers: [CharacterService],
-  imports: [TypeOrmModule.forFeature([Character])],
+  imports: [TypeOrmModule.forFeature([Character]), TokenModule],
 })
 export class CharacterModule { }

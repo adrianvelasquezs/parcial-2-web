@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Location } from './entities/location.entity';
 import { CharacterService } from '../character/character.service';
 import { Character } from '../character/entities/character.entity';
+import { TokenModule } from '../token/token.module';
 
 @Module({
   controllers: [LocationController],
   providers: [LocationService, CharacterService],
-  imports: [TypeOrmModule.forFeature([Location, Character])],
+  imports: [TypeOrmModule.forFeature([Location, Character]), TokenModule],
 })
 export class LocationModule { }
