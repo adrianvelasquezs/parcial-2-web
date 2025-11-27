@@ -5,11 +5,16 @@ import { UpdateTokenDto } from './dto/update-token.dto';
 
 @Controller('token')
 export class TokenController {
-  constructor(private readonly tokenService: TokenService) {}
+  constructor(private readonly tokenService: TokenService) { }
 
   @Post()
   create(@Body() createTokenDto: CreateTokenDto) {
     return this.tokenService.create(createTokenDto);
+  }
+
+  @Post('validate')
+  validate(@Body('token') token: string) {
+    return this.tokenService.validate(token);
   }
 
   @Get()
@@ -19,16 +24,16 @@ export class TokenController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.tokenService.findOne(+id);
+    return this.tokenService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTokenDto: UpdateTokenDto) {
-    return this.tokenService.update(+id, updateTokenDto);
+  @Patch('reduce/:id')
+  reduce(@Param('id') id: string) {
+    return this.tokenService.reduce(id);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.tokenService.remove(+id);
+    return this.tokenService.remove(id);
   }
 }
