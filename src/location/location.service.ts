@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Location } from './entities/location.entity';
 import { Repository } from 'typeorm';
 import { Character } from '../character/entities/character.entity';
-import { CharacterService } from 'src/character/character.service';
 
 @Injectable()
 export class LocationService {
@@ -15,12 +14,11 @@ export class LocationService {
     private readonly locationRepository: Repository<Location>,
     @InjectRepository(Character)
     private readonly characterRepository: Repository<Character>,
-    private readonly characterService: CharacterService,
   ) { }
 
   async create(createLocationDto: CreateLocationDto) {
     const { owner, ...rest } = createLocationDto;
-    const character = await this.characterService.findOne(owner);
+    const character = await this.characterRepository.findOne({ where: { id: owner }, relations: ['property'] });
     if (character != null) {
       const { property } = character;
       if (property) {
@@ -28,7 +26,7 @@ export class LocationService {
       }
       const location = this.locationRepository.create({ ...rest });
       character.property = location;
-      this.characterService.update(owner, { property: location.id });
+      this.characterRepository.update(owner, { property: { id: location.id } });
       return this.locationRepository.save(location);
     }
     throw new Error('Character not found');
