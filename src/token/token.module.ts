@@ -10,4 +10,4 @@ import { Token } from './entities/token.entity';
   providers: [TokenService],
   exports: [TokenService],
 })
-export class TokenModule { }
+export class TokenModule {}

@@ -1,7 +1,15 @@
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+
 export class CreateLocationDto {
-    name: string;
-    type: string;
-    cost: number;
-    owner: number;
-    favCharacters?: number[];
+  @IsString()
+  name: string;
+  @IsString()
+  type: string;
+  @IsNumber()
+  cost: number;
+  @IsNumber()
+  owner: number;
+  @IsNumber({}, { each: true })
+  @IsOptional()
+  favCharacters?: number[];
 }

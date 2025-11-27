@@ -10,4 +10,4 @@ import { TokenModule } from '../token/token.module';
   providers: [CharacterService],
   imports: [TypeOrmModule.forFeature([Character]), TokenModule],
 })
-export class CharacterModule { }
+export class CharacterModule {}

@@ -1,8 +1,20 @@
+import { IsString, IsBoolean, IsNumber, IsOptional } from 'class-validator';
+
 export class CreateCharacterDto {
-    name: string;
-    type: string;
-    age: number;
-    employee: boolean;
-    property?: number;
-    favPlaces?: number[];
+  @IsString()
+  name: string;
+
+  @IsNumber()
+  salary: number;
+
+  @IsBoolean()
+  employee: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  property?: number;
+
+  @IsOptional()
+  @IsNumber({}, { each: true })
+  favPlaces?: number[];
 }

@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTokenDto } from './dto/create-token.dto';
-import { UpdateTokenDto } from './dto/update-token.dto';
 import { Token } from './entities/token.entity';
 
 @Injectable()
@@ -10,7 +9,7 @@ export class TokenService {
   constructor(
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
-  ) { }
+  ) {}
 
   async create(createTokenDto: CreateTokenDto) {
     const token = this.tokenRepository.create(createTokenDto);
@@ -27,6 +26,11 @@ export class TokenService {
       throw new NotFoundException(`Token with ID ${id} not found`);
     }
     return token;
+  }
+
+  // Método nuevo para el Interceptor
+  async findByToken(tokenString: string) {
+    return await this.tokenRepository.findOneBy({ token: tokenString });
   }
 
   async reduce(id: string) {

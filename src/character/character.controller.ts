@@ -1,12 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CharacterService } from './character.service';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { TokenGuard } from '../token/token.guard';
+import { TokenInterceptor } from '../token/token.interceptor';
 
 @Controller('character')
 @UseGuards(TokenGuard)
+@UseInterceptors(TokenInterceptor) // Reduce el token tras ejecución exitosa
 export class CharacterController {
-  constructor(private readonly characterService: CharacterService) { }
+  constructor(private readonly characterService: CharacterService) {}
 
   @Post()
   create(@Body() createCharacterDto: CreateCharacterDto) {
@@ -14,7 +25,10 @@ export class CharacterController {
   }
 
   @Patch(':id/favorites/:locationId')
-  addFavoriteLocation(@Param('id') id: string, @Param('locationId') locationId: string) {
+  addFavoriteLocation(
+    @Param('id') id: string,
+    @Param('locationId') locationId: string,
+  ) {
     return this.characterService.addFavoriteLocation(+id, +locationId);
   }
 

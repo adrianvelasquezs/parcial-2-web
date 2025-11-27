@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable */
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { UpdateCharacterDto } from './dto/update-character.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,17 +9,20 @@ import { Location } from '../location/entities/location.entity';
 
 @Injectable()
 export class CharacterService {
-
   constructor(
     @InjectRepository(Character)
     private readonly characterRepository: Repository<Character>,
-  ) { }
+  ) {}
 
   create(createCharacterDto: CreateCharacterDto) {
     const character = this.characterRepository.create({
       ...createCharacterDto,
-      property: createCharacterDto.property ? { id: createCharacterDto.property } : undefined,
-      favPlaces: createCharacterDto.favPlaces ? createCharacterDto.favPlaces.map(id => ({ id })) : undefined,
+      property: createCharacterDto.property
+        ? { id: createCharacterDto.property }
+        : undefined,
+      favPlaces: createCharacterDto.favPlaces
+        ? createCharacterDto.favPlaces.map((id) => ({ id }))
+        : undefined,
     });
     return this.characterRepository.save(character);
   }
@@ -30,23 +34,28 @@ export class CharacterService {
         ...updateCharacterDto,
       };
 
-      // Transform property from number to Location reference
       if (updateCharacterDto.property !== undefined) {
-        updateData.property = updateCharacterDto.property ? { id: updateCharacterDto.property } : null;
+        updateData.property = updateCharacterDto.property
+          ? { id: updateCharacterDto.property }
+          : null;
       }
 
-      // Transform favPlaces from number[] to Location references
       if (updateCharacterDto.favPlaces !== undefined) {
-        updateData.favPlaces = updateCharacterDto.favPlaces ? updateCharacterDto.favPlaces.map(id => ({ id })) : [];
+        updateData.favPlaces = updateCharacterDto.favPlaces
+          ? updateCharacterDto.favPlaces.map((id) => ({ id }))
+          : [];
       }
 
       return this.characterRepository.update(id, updateData);
     }
-    throw new Error(`Character with id ${id} not found`);
+    throw new NotFoundException(`Character with id ${id} not found`);
   }
 
   findOne(id: number) {
-    return this.characterRepository.findOne({ where: { id }, relations: ['property'] });
+    return this.characterRepository.findOne({
+      where: { id },
+      relations: ['property', 'favPlaces'],
+    });
   }
 
   async calculateTaxes(id: number) {
@@ -62,24 +71,27 @@ export class CharacterService {
         } else {
           coef = 0.03;
         }
-        return { taxDebt: property.cost * coef };
+        // Fórmula corregida: COSTO_LOCATION * (1 + COEF.)
+        return { taxDebt: property.cost * (1 + coef) };
       } else {
         return { taxDebt: 0 };
       }
     }
-    throw new Error(`Character with id ${id} not found`);
+    throw new NotFoundException(`Character with id ${id} not found`);
   }
 
   async addFavoriteLocation(id: number, favPlaceId: number) {
     const character = await this.findOne(id);
-    if (character) {
-      const { favPlaces } = character;
-      if (favPlaces.some(place => place.id === favPlaceId)) {
-        throw new Error('Character already has this favorite place');
-      }
-      character.favPlaces.push({ id: favPlaceId } as Location);
-      return this.characterRepository.save(character);
+    if (!character)
+      throw new NotFoundException(`Character with id ${id} not found`);
+
+    // Verificamos si ya existe para no duplicar
+    if (character.favPlaces.some((place) => place.id === favPlaceId)) {
+      throw new Error('Character already has this favorite place');
     }
-    throw new Error(`Character with id ${id} not found`);
+
+    // Agregamos solo la referencia por ID
+    character.favPlaces.push({ id: favPlaceId } as Location);
+    return this.characterRepository.save(character);
   }
 }

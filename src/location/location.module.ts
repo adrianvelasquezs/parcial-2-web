@@ -12,4 +12,4 @@ import { TokenModule } from '../token/token.module';
   providers: [LocationService, CharacterService],
   imports: [TypeOrmModule.forFeature([Location, Character]), TokenModule],
 })
-export class LocationModule { }
+export class LocationModule {}
